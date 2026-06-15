@@ -7,9 +7,6 @@
 <meta name="description" content="Consulta del Padrón de Egresados de la Universidad Nacional de Cuyo">
 
 <style>
-  /* ============================================================
-     VARIABLES GLOBALES - Colores institucionales UNCuyo
-     ============================================================ */
   :root {
     --azul-uncuyo: #1c3f6e;
     --azul-oscuro: #122b4d;
@@ -24,22 +21,8 @@
     --transicion-media: 0.5s ease;
   }
 
-  /* ============================================================
-     RESET BÁSICO Y BASE
-     ============================================================ */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  html, body {
-    height: 100%;
-    width: 100%;
-    overflow-x: hidden;
-  }
-
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; width: 100%; overflow-x: hidden; }
   body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background-color: var(--gris-claro);
@@ -47,486 +30,221 @@
     -webkit-font-smoothing: antialiased;
     line-height: 1.5;
   }
-
-  /* Foco visible para accesibilidad / navegación por teclado */
-  a:focus-visible,
-  button:focus-visible,
-  input:focus-visible {
-    outline: 3px solid var(--dorado);
-    outline-offset: 3px;
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 3px solid var(--dorado); outline-offset: 3px;
   }
 
-  /* ============================================================
-     CONTENEDOR PRINCIPAL DE PANTALLAS
-     ============================================================ */
-  .pantalla {
-    display: none;
-    min-height: 100vh;
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
+  /* PANTALLAS */
+  .pantalla { display: none; min-height: 100vh; width: 100%; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+  .pantalla.activa { display: flex; animation: fadeIn var(--transicion-media); }
 
-  .pantalla.activa {
-    display: flex;
-    animation: fadeIn var(--transicion-media);
-  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+  @keyframes pulso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+  @keyframes zoomCinema { from { transform: scale(1); } to { transform: scale(1.12); } }
+  @keyframes giroSuave { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes apareceArriba { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes tiemble { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.92); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  @keyframes pulso {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-  }
-
-  @keyframes zoomCinema {
-    from { transform: scale(1); }
-    to { transform: scale(1.12); }
-  }
-
-  @keyframes giroSuave {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  @keyframes apareceArriba {
-    from { opacity: 0; transform: translateY(-15px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ============================================================
-     PANTALLA 1 - BIENVENIDA
-     ============================================================ */
-  #pantalla-bienvenida {
-    padding: 0;
-    background-color: var(--azul-oscuro);
-  }
-
-  .bienvenida-fondo {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    cursor: pointer;
-  }
-
-  .bienvenida-fondo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background-color: var(--blanco);
-    animation: zoomCinema 25s ease-in-out infinite alternate;
-  }
-
-  /* Overlay semitransparente para mejorar lectura/contraste */
+  /* PANTALLA 1 - BIENVENIDA */
+  #pantalla-bienvenida { padding: 0; background-color: var(--azul-oscuro); }
+  .bienvenida-fondo { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; cursor: pointer; }
+  .bienvenida-fondo img { width: 100%; height: 100%; object-fit: contain; background-color: var(--blanco); animation: zoomCinema 25s ease-in-out infinite alternate; }
   .bienvenida-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(18, 43, 77, 0.05) 0%,
-      rgba(18, 43, 77, 0.55) 100%
-    );
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    text-align: center;
-    padding: 2rem 1.5rem 3rem;
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(18,43,77,0.05) 0%, rgba(18,43,77,0.55) 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    text-align: center; padding: 2rem 1.5rem 3rem;
   }
-
   .bienvenida-overlay h1 {
-    color: var(--blanco);
-    font-size: clamp(1.4rem, 5vw, 2.6rem);
-    font-weight: 800;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
-    letter-spacing: 0.5px;
-    animation: pulso 2.5s ease-in-out infinite;
-    line-height: 1.25;
+    color: var(--blanco); font-size: clamp(1.4rem, 5vw, 2.6rem); font-weight: 800;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6); letter-spacing: 0.5px;
+    animation: pulso 2.5s ease-in-out infinite; line-height: 1.25;
   }
+  .bienvenida-overlay p { color: rgba(255,255,255,0.85); margin-top: 1rem; font-size: clamp(0.9rem,2.5vw,1.1rem); font-weight: 600; }
 
-  .bienvenida-overlay p {
-    color: rgba(255,255,255,0.85);
-    margin-top: 1rem;
-    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-    font-weight: 600;
+  /* TARJETAS */
+  .contenedor-tarjeta { width: 100%; max-width: 540px; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; }
+  .tarjeta { background: var(--blanco); width: 100%; border-radius: 18px; padding: 2rem 1.75rem; box-shadow: 0 10px 35px var(--sombra); text-align: center; animation: scaleIn 0.45s ease; border-top: 6px solid var(--azul-uncuyo); }
+  .tarjeta__icono { width: 70px; height: 70px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; animation: scaleIn 0.5s ease 0.1s backwards; }
+  .tarjeta__icono svg { width: 38px; height: 38px; }
+  .icono-exito { background-color: rgba(46,139,87,0.12); color: var(--verde-ok); }
+  .icono-info { background-color: rgba(28,63,110,0.1); color: var(--azul-uncuyo); }
+  .tarjeta h1 { font-size: clamp(1.3rem, 4vw, 1.7rem); color: var(--azul-oscuro); margin-bottom: 0.6rem; font-weight: 800; }
+  .tarjeta__texto-explicativo { color: var(--gris-texto); font-size: 0.95rem; margin-bottom: 1.5rem; }
+  .tarjeta__resultado { font-size: 1.05rem; color: var(--gris-texto); margin-bottom: 1.5rem; line-height: 1.7; }
+  .tarjeta__resultado strong { color: var(--azul-oscuro); }
+  .tarjeta__resultado .destacado { color: var(--bordo); font-weight: 700; }
+
+  /* TABS DE MODO DE BÚSQUEDA */
+  .tabs-busqueda {
+    display: flex; gap: 0; margin-bottom: 1.5rem; border-radius: 10px; overflow: hidden;
+    border: 2px solid var(--azul-uncuyo);
   }
-
-  /* ============================================================
-     CONTENEDOR GENERAL DE TARJETAS (Pantallas 2, 3, 4)
-     ============================================================ */
-  .contenedor-tarjeta {
-    width: 100%;
-    max-width: 520px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .tab-btn {
+    flex: 1; padding: 0.65rem 0.5rem; font-size: 0.88rem; font-weight: 700;
+    border: none; cursor: pointer; background: var(--blanco); color: var(--azul-uncuyo);
+    transition: background-color var(--transicion-rapida), color var(--transicion-rapida);
+    line-height: 1.3;
   }
+  .tab-btn.activo { background: var(--azul-uncuyo); color: var(--blanco); }
+  .tab-btn:not(.activo):hover { background: var(--gris-claro); }
 
-  .tarjeta {
-    background: var(--blanco);
-    width: 100%;
-    border-radius: 18px;
-    padding: 2rem 1.75rem;
-    box-shadow: 0 10px 35px var(--sombra);
-    text-align: center;
-    animation: scaleIn 0.45s ease;
-    border-top: 6px solid var(--azul-uncuyo);
-  }
+  /* PANELES DE MODO */
+  .panel-busqueda { display: none; }
+  .panel-busqueda.activo { display: block; animation: fadeIn 0.3s ease; }
 
-  .tarjeta__icono {
-    width: 70px;
-    height: 70px;
-    margin: 0 auto 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    animation: scaleIn 0.5s ease 0.1s backwards;
-  }
-
-  .tarjeta__icono svg {
-    width: 38px;
-    height: 38px;
-  }
-
-  .icono-exito {
-    background-color: rgba(46, 139, 87, 0.12);
-    color: var(--verde-ok);
-  }
-
-  .icono-info {
-    background-color: rgba(28, 63, 110, 0.1);
-    color: var(--azul-uncuyo);
-  }
-
-  .tarjeta h1 {
-    font-size: clamp(1.3rem, 4vw, 1.7rem);
-    color: var(--azul-oscuro);
-    margin-bottom: 0.6rem;
-    font-weight: 800;
-  }
-
-  .tarjeta__texto-explicativo {
-    color: var(--gris-texto);
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .tarjeta__resultado {
-    font-size: 1.05rem;
-    color: var(--gris-texto);
-    margin-bottom: 1.5rem;
-    line-height: 1.7;
-  }
-
-  .tarjeta__resultado strong {
-    color: var(--azul-oscuro);
-  }
-
-  .tarjeta__resultado .destacado {
-    color: var(--bordo);
-    font-weight: 700;
-  }
-
-  /* ============================================================
-     FORMULARIO - PANTALLA 2
-     ============================================================ */
-  .campo-grupo {
-    margin-bottom: 1.5rem;
-    text-align: left;
-  }
-
-  .campo-grupo label {
-    display: block;
-    font-weight: 700;
-    color: var(--azul-oscuro);
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-  }
-
+  /* CAMPOS */
+  .campo-grupo { margin-bottom: 1.25rem; text-align: left; }
+  .campo-grupo label { display: block; font-weight: 700; color: var(--azul-oscuro); margin-bottom: 0.5rem; font-size: 0.95rem; }
   .campo-input {
-    width: 100%;
-    padding: 0.9rem 1rem;
-    font-size: 1.3rem;
-    text-align: center;
-    letter-spacing: 4px;
-    border: 2px solid #d6dde6;
-    border-radius: 10px;
+    width: 100%; padding: 0.9rem 1rem; font-size: 1.1rem; text-align: center;
+    border: 2px solid #d6dde6; border-radius: 10px;
     transition: border-color var(--transicion-rapida), box-shadow var(--transicion-rapida);
-    font-weight: 700;
-    color: var(--azul-oscuro);
-    background-color: var(--gris-claro);
+    font-weight: 700; color: var(--azul-oscuro); background-color: var(--gris-claro);
   }
+  .campo-input.dni-input { font-size: 1.3rem; letter-spacing: 4px; }
+  .campo-input:focus { border-color: var(--azul-uncuyo); box-shadow: 0 0 0 4px rgba(28,63,110,0.12); outline: none; }
+  .campo-input.error { border-color: var(--bordo); animation: tiemble 0.3s; }
+  .mensaje-error { color: var(--bordo); font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2rem; font-weight: 600; animation: apareceArriba 0.3s ease; }
 
-  .campo-input:focus {
-    border-color: var(--azul-uncuyo);
-    box-shadow: 0 0 0 4px rgba(28, 63, 110, 0.12);
-    outline: none;
+  /* LISTA DE RESULTADOS POR NOMBRE */
+  .lista-resultados {
+    margin-top: 1rem; max-height: 280px; overflow-y: auto;
+    border: 2px solid #d6dde6; border-radius: 10px; text-align: left;
   }
-
-  .campo-input.error {
-    border-color: var(--bordo);
-    animation: tiemble 0.3s;
+  .lista-resultados:empty { display: none; }
+  .item-resultado {
+    padding: 0.85rem 1rem; cursor: pointer; border-bottom: 1px solid #e8ecf0;
+    transition: background-color var(--transicion-rapida);
+    display: flex; flex-direction: column; gap: 0.2rem;
   }
+  .item-resultado:last-child { border-bottom: none; }
+  .item-resultado:hover, .item-resultado:focus { background-color: rgba(28,63,110,0.06); outline: none; }
+  .item-resultado__nombre { font-weight: 700; color: var(--azul-oscuro); font-size: 0.95rem; }
+  .item-resultado__unidad { font-size: 0.82rem; color: var(--gris-texto); }
+  .lista-mensaje { padding: 1rem; text-align: center; color: var(--gris-texto); font-size: 0.9rem; font-style: italic; }
 
-  @keyframes tiemble {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-6px); }
-    75% { transform: translateX(6px); }
-  }
+  /* SEPARADOR */
+  .separador { display: flex; align-items: center; gap: 0.75rem; margin: 1.25rem 0; color: #aab4c0; font-size: 0.85rem; }
+  .separador::before, .separador::after { content: ''; flex: 1; height: 1px; background: #d6dde6; }
 
-  .mensaje-error {
-    color: var(--bordo);
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
-    min-height: 1.2rem;
-    font-weight: 600;
-    animation: apareceArriba 0.3s ease;
-  }
-
-  /* ============================================================
-     BOTONES
-     ============================================================ */
+  /* BOTONES */
   .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 1rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 700;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    width: 100%; padding: 1rem 1.5rem; font-size: 1rem; font-weight: 700;
+    border: none; border-radius: 10px; cursor: pointer;
     transition: transform var(--transicion-rapida), box-shadow var(--transicion-rapida), background-color var(--transicion-rapida);
     text-decoration: none;
   }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+  .btn:active { transform: translateY(0); }
+  .btn-primario { background-color: var(--azul-uncuyo); color: var(--blanco); }
+  .btn-primario:hover { background-color: var(--azul-oscuro); }
+  .btn-secundario { background-color: transparent; color: var(--azul-uncuyo); border: 2px solid var(--azul-uncuyo); margin-top: 0.75rem; }
+  .btn-secundario:hover { background-color: rgba(28,63,110,0.06); }
+  .btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+  .grupo-botones { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem; }
 
-  .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-  }
+  /* LOADER */
+  .loader-overlay { position: fixed; inset: 0; background: rgba(18,43,77,0.55); display: none; align-items: center; justify-content: center; z-index: 999; backdrop-filter: blur(2px); }
+  .loader-overlay.activo { display: flex; animation: fadeIn 0.2s ease; }
+  .loader-caja { background: var(--blanco); border-radius: 16px; padding: 2rem 2.5rem; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.25); }
+  .loader-spinner { width: 48px; height: 48px; border: 5px solid var(--gris-claro); border-top-color: var(--azul-uncuyo); border-radius: 50%; margin: 0 auto 1rem; animation: giroSuave 0.9s linear infinite; }
+  .loader-caja p { color: var(--azul-oscuro); font-weight: 700; font-size: 0.95rem; }
 
-  .btn:active {
-    transform: translateY(0);
-  }
+  /* PIE */
+  .pie-institucional { margin-top: 1.5rem; text-align: center; font-size: 0.75rem; color: #8a93a3; padding: 0 1rem; }
 
-  .btn-primario {
-    background-color: var(--azul-uncuyo);
-    color: var(--blanco);
-  }
-
-  .btn-primario:hover {
-    background-color: var(--azul-oscuro);
-  }
-
-  .btn-secundario {
-    background-color: transparent;
-    color: var(--azul-uncuyo);
-    border: 2px solid var(--azul-uncuyo);
-    margin-top: 0.75rem;
-  }
-
-  .btn-secundario:hover {
-    background-color: rgba(28, 63, 110, 0.06);
-  }
-
-  .btn:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .grupo-botones {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-  }
-
-  /* ============================================================
-     LOADER (cargando)
-     ============================================================ */
-  .loader-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(18, 43, 77, 0.55);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
-    backdrop-filter: blur(2px);
-  }
-
-  .loader-overlay.activo {
-    display: flex;
-    animation: fadeIn 0.2s ease;
-  }
-
-  .loader-caja {
-    background: var(--blanco);
-    border-radius: 16px;
-    padding: 2rem 2.5rem;
-    text-align: center;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-  }
-
-  .loader-spinner {
-    width: 48px;
-    height: 48px;
-    border: 5px solid var(--gris-claro);
-    border-top-color: var(--azul-uncuyo);
-    border-radius: 50%;
-    margin: 0 auto 1rem;
-    animation: giroSuave 0.9s linear infinite;
-  }
-
-  .loader-caja p {
-    color: var(--azul-oscuro);
-    font-weight: 700;
-    font-size: 0.95rem;
-  }
-
-  /* ============================================================
-     PIE DE PÁGINA / INSTITUCIONAL
-     ============================================================ */
-  .pie-institucional {
-    margin-top: 1.5rem;
-    text-align: center;
-    font-size: 0.75rem;
-    color: #8a93a3;
-    padding: 0 1rem;
-  }
-
-  /* ============================================================
-     RESPONSIVE - BREAKPOINTS
-     ============================================================ */
-
-  /* 320px - Móviles muy pequeños (estilos base ya cubren esto, ajustes finos) */
-  @media (max-width: 360px) {
-    .tarjeta { padding: 1.5rem 1.25rem; }
-    .campo-input { font-size: 1.1rem; letter-spacing: 2px; }
-  }
-
-  /* 480px - Móviles grandes */
-  @media (min-width: 480px) {
-    .tarjeta { padding: 2.25rem 2rem; }
-  }
-
-  /* 768px - Tablets */
+  /* RESPONSIVE */
+  @media (max-width: 360px) { .tarjeta { padding: 1.5rem 1.25rem; } .campo-input { font-size: 1rem; } .tab-btn { font-size: 0.8rem; padding: 0.6rem 0.35rem; } }
+  @media (min-width: 480px) { .tarjeta { padding: 2.25rem 2rem; } }
   @media (min-width: 768px) {
-    .contenedor-tarjeta { max-width: 560px; }
+    .contenedor-tarjeta { max-width: 580px; }
     .tarjeta { padding: 2.75rem 3rem; }
-    .grupo-botones {
-      flex-direction: row;
-    }
-    .grupo-botones .btn-secundario {
-      margin-top: 0;
-    }
+    .grupo-botones { flex-direction: row; }
+    .grupo-botones .btn-secundario { margin-top: 0; }
     .bienvenida-overlay { padding-bottom: 4rem; }
   }
-
-  /* 1024px - Desktop */
-  @media (min-width: 1024px) {
-    .contenedor-tarjeta { max-width: 620px; }
-    .tarjeta__resultado { font-size: 1.15rem; }
-    .bienvenida-overlay h1 { font-size: 2.4rem; }
-  }
-
-  /* 1440px - Pantallas grandes */
-  @media (min-width: 1440px) {
-    .contenedor-tarjeta { max-width: 680px; }
-  }
-
-  /* Reducción de movimiento para usuarios que lo prefieran (accesibilidad) */
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
+  @media (min-width: 1024px) { .contenedor-tarjeta { max-width: 640px; } .tarjeta__resultado { font-size: 1.15rem; } }
+  @media (min-width: 1440px) { .contenedor-tarjeta { max-width: 700px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
 </style>
 </head>
 <body>
 
-<!-- ============================================================
-     PANTALLA 1 - BIENVENIDA
-     ============================================================ -->
+<!-- PANTALLA 1 - BIENVENIDA -->
 <section id="pantalla-bienvenida" class="pantalla activa" aria-label="Pantalla de bienvenida">
-  <div class="bienvenida-fondo"
-       id="btnBienvenida"
-       role="button"
-       tabindex="0"
+  <div class="bienvenida-fondo" id="btnBienvenida" role="button" tabindex="0"
        aria-label="Hacer clic para iniciar la consulta del Padrón de Egresados de la UNCuyo">
     <img src="foto.png" alt="Escudo de la Universidad Nacional de Cuyo - Mendoza, Argentina">
     <div class="bienvenida-overlay">
       <h1>Hacer clic en la imagen para consultar el Padrón de Egresados de la UNCuyo</h1>
-      <p>Elección de autoridades UNCuyo - Consulta de Padrón</p>
+      <p>Elección de autoridades UNCuyo &mdash; Consulta de Padrón</p>
     </div>
   </div>
 </section>
 
-<!-- ============================================================
-     PANTALLA 2 - CONSULTA DE DNI
-     ============================================================ -->
-<section id="pantalla-consulta" class="pantalla" aria-label="Formulario de consulta de documento">
+<!-- PANTALLA 2 - CONSULTA -->
+<section id="pantalla-consulta" class="pantalla" aria-label="Formulario de consulta">
   <div class="contenedor-tarjeta">
     <div class="tarjeta">
       <h1>Consulta de Padrón de Egresados</h1>
-      <p class="tarjeta__texto-explicativo">
-        Ingrese su número de documento sin puntos ni espacios.
-      </p>
+      <p class="tarjeta__texto-explicativo">Elegí cómo querés buscar tu registro en el padrón.</p>
 
-      <form id="formConsulta" novalidate>
-        <div class="campo-grupo">
-          <label for="inputDNI">Número de Documento</label>
-          <input
-            type="text"
-            id="inputDNI"
-            name="dni"
-            class="campo-input"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            maxlength="8"
-            autocomplete="off"
-            placeholder="Ej: 12345678"
-            aria-label="Número de documento, máximo 8 dígitos, solo números"
-            aria-describedby="errorDNI"
-            required>
-          <div id="errorDNI" class="mensaje-error" role="alert" aria-live="polite"></div>
-        </div>
-
-        <button type="submit" class="btn btn-primario" id="btnConsultar">
-          Consultar
+      <!-- TABS -->
+      <div class="tabs-busqueda" role="tablist" aria-label="Modo de búsqueda">
+        <button class="tab-btn activo" id="tab-dni" role="tab" aria-selected="true" aria-controls="panel-dni">
+          🔢 Buscar por DNI
         </button>
-      </form>
+        <button class="tab-btn" id="tab-nombre" role="tab" aria-selected="false" aria-controls="panel-nombre">
+          🔤 Buscar por Apellido/Nombre
+        </button>
+      </div>
 
-      <p class="pie-institucional">
-        Universidad Nacional de Cuyo &mdash; Padrón de Egresados
-      </p>
+      <!-- PANEL DNI -->
+      <div class="panel-busqueda activo" id="panel-dni" role="tabpanel" aria-labelledby="tab-dni">
+        <form id="formDNI" novalidate>
+          <div class="campo-grupo">
+            <label for="inputDNI">Número de Documento</label>
+            <input type="text" id="inputDNI" class="campo-input dni-input" inputmode="numeric"
+                   pattern="[0-9]*" maxlength="8" autocomplete="off" placeholder="Ej: 12345678"
+                   aria-label="Número de documento, máximo 8 dígitos" aria-describedby="errorDNI" required>
+            <div id="errorDNI" class="mensaje-error" role="alert" aria-live="polite"></div>
+          </div>
+          <button type="submit" class="btn btn-primario" id="btnConsultarDNI">Consultar</button>
+        </form>
+      </div>
+
+      <!-- PANEL NOMBRE -->
+      <div class="panel-busqueda" id="panel-nombre" role="tabpanel" aria-labelledby="tab-nombre">
+        <form id="formNombre" novalidate>
+          <div class="campo-grupo">
+            <label for="inputApellido">Apellido</label>
+            <input type="text" id="inputApellido" class="campo-input" autocomplete="off"
+                   placeholder="Ej: GARCIA" maxlength="60"
+                   aria-label="Apellido para buscar" aria-describedby="errorNombre" required>
+          </div>
+          <div class="campo-grupo">
+            <label for="inputNombre">Nombre (opcional)</label>
+            <input type="text" id="inputNombre" class="campo-input" autocomplete="off"
+                   placeholder="Ej: MARIA" maxlength="60" aria-label="Nombre para buscar (opcional)">
+          </div>
+          <div id="errorNombre" class="mensaje-error" role="alert" aria-live="polite"></div>
+          <button type="submit" class="btn btn-primario" id="btnBuscarNombre">Buscar</button>
+        </form>
+
+        <!-- Lista de coincidencias -->
+        <div id="listaResultados" class="lista-resultados" role="listbox" aria-label="Resultados de la búsqueda" aria-live="polite"></div>
+      </div>
+
+      <p class="pie-institucional">Universidad Nacional de Cuyo &mdash; Padrón de Egresados</p>
     </div>
   </div>
 </section>
 
-<!-- ============================================================
-     PANTALLA 3 - RESULTADO EXITOSO
-     ============================================================ -->
-<section id="pantalla-exito" class="pantalla" aria-label="Resultado de la consulta: encontrado">
+<!-- PANTALLA 3 - ÉXITO -->
+<section id="pantalla-exito" class="pantalla" aria-label="Resultado encontrado">
   <div class="contenedor-tarjeta">
     <div class="tarjeta">
       <div class="tarjeta__icono icono-exito" aria-hidden="true">
@@ -540,23 +258,16 @@
         Votás en el Padrón de Egresados de la <span class="destacado" id="resultadoUnidad"></span>.<br><br>
         Gracias por tu interés en participar de la elección de autoridades de la UNCuyo.
       </div>
-
       <div class="grupo-botones">
-        <button type="button" class="btn btn-primario" id="btnExitoOtraConsulta">
-          Otra consulta
-        </button>
-        <button type="button" class="btn btn-secundario" id="btnExitoFinalizar">
-          Finalizar
-        </button>
+        <button type="button" class="btn btn-primario" id="btnExitoOtraConsulta">Otra consulta</button>
+        <button type="button" class="btn btn-secundario" id="btnExitoFinalizar">Finalizar</button>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============================================================
-     PANTALLA 4 - DNI NO ENCONTRADO
-     ============================================================ -->
-<section id="pantalla-no-encontrado" class="pantalla" aria-label="Resultado de la consulta: no encontrado">
+<!-- PANTALLA 4 - NO ENCONTRADO -->
+<section id="pantalla-no-encontrado" class="pantalla" aria-label="Documento no encontrado">
   <div class="contenedor-tarjeta">
     <div class="tarjeta">
       <div class="tarjeta__icono icono-info" aria-hidden="true">
@@ -574,22 +285,15 @@
         Le sugerimos ratificar esta información en la unidad académica de la que egresó.<br><br>
         Gracias por su interés en participar.
       </div>
-
       <div class="grupo-botones">
-        <button type="button" class="btn btn-primario" id="btnNoEncontradoReintentar">
-          Intentar nuevamente
-        </button>
-        <button type="button" class="btn btn-secundario" id="btnNoEncontradoFinalizar">
-          Finalizar
-        </button>
+        <button type="button" class="btn btn-primario" id="btnNoEncontradoReintentar">Intentar nuevamente</button>
+        <button type="button" class="btn btn-secundario" id="btnNoEncontradoFinalizar">Finalizar</button>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============================================================
-     LOADER GLOBAL
-     ============================================================ -->
+<!-- LOADER -->
 <div class="loader-overlay" id="loader" role="status" aria-live="assertive">
   <div class="loader-caja">
     <div class="loader-spinner" aria-hidden="true"></div>
@@ -600,195 +304,282 @@
 <script>
   /* ============================================================
      CONFIGURACIÓN
-     ============================================================
-     Reemplazar la siguiente constante con la URL de implementación
-     del Web App de Google Apps Script (terminada en /exec).
-     Ejemplo: https://script.google.com/macros/s/AKfycb.../exec
+     Reemplazar con la URL del Web App de Google Apps Script.
   ============================================================ */
-  const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyOKVfeE-eWQIAbkmxI1AKkczhZQTGV0zlFbJAeK9dZoicUrbg8tLH80pE4NCxcKR95LQ/exec";
+  const URL_APPS_SCRIPT = "PEGAR_AQUI_LA_URL_DEL_WEB_APP";
 
   /* ============================================================
-     REFERENCIAS A ELEMENTOS DEL DOM
-     ============================================================ */
+     REFERENCIAS DOM
+  ============================================================ */
   const pantallas = {
     bienvenida: document.getElementById('pantalla-bienvenida'),
-    consulta: document.getElementById('pantalla-consulta'),
-    exito: document.getElementById('pantalla-exito'),
+    consulta:   document.getElementById('pantalla-consulta'),
+    exito:      document.getElementById('pantalla-exito'),
     noEncontrado: document.getElementById('pantalla-no-encontrado')
   };
 
-  const btnBienvenida = document.getElementById('btnBienvenida');
-  const formConsulta = document.getElementById('formConsulta');
-  const inputDNI = document.getElementById('inputDNI');
-  const errorDNI = document.getElementById('errorDNI');
-  const btnConsultar = document.getElementById('btnConsultar');
-  const loader = document.getElementById('loader');
+  const loader               = document.getElementById('loader');
+  const resultadoNombre      = document.getElementById('resultadoNombre');
+  const resultadoUnidad      = document.getElementById('resultadoUnidad');
+  const resultadoDNINoEnc    = document.getElementById('resultadoDNINoEncontrado');
 
-  const resultadoNombre = document.getElementById('resultadoNombre');
-  const resultadoUnidad = document.getElementById('resultadoUnidad');
-  const resultadoDNINoEncontrado = document.getElementById('resultadoDNINoEncontrado');
+  // Panel DNI
+  const formDNI              = document.getElementById('formDNI');
+  const inputDNI             = document.getElementById('inputDNI');
+  const errorDNI             = document.getElementById('errorDNI');
+
+  // Panel Nombre
+  const formNombre           = document.getElementById('formNombre');
+  const inputApellido        = document.getElementById('inputApellido');
+  const inputNombre          = document.getElementById('inputNombre');
+  const errorNombre          = document.getElementById('errorNombre');
+  const listaResultados      = document.getElementById('listaResultados');
+
+  // Tabs
+  const tabDNI               = document.getElementById('tab-dni');
+  const tabNombre            = document.getElementById('tab-nombre');
+  const panelDNI             = document.getElementById('panel-dni');
+  const panelNombre          = document.getElementById('panel-nombre');
 
   /* ============================================================
-     NAVEGACIÓN ENTRE PANTALLAS
-     ============================================================ */
+     UTILIDADES
+  ============================================================ */
+  function sanitizar(texto) {
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.textContent;
+  }
+
+  function mostrarLoader(activo) {
+    loader.classList.toggle('activo', activo);
+  }
+
   function mostrarPantalla(nombre) {
     Object.values(pantallas).forEach(p => p.classList.remove('activa'));
     pantallas[nombre].classList.add('activa');
-    // Mover el foco al título de la nueva pantalla para accesibilidad
     const titulo = pantallas[nombre].querySelector('h1');
-    if (titulo) {
-      titulo.setAttribute('tabindex', '-1');
-      titulo.focus({ preventScroll: true });
-    }
+    if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); }
     window.scrollTo(0, 0);
   }
 
-  /* Pantalla 1 -> Pantalla 2 (clic o teclado) */
+  /* ============================================================
+     NAVEGACIÓN
+  ============================================================ */
   function irAConsulta() {
+    // Limpiar estado
     inputDNI.value = '';
     errorDNI.textContent = '';
     inputDNI.classList.remove('error');
+    inputApellido.value = '';
+    inputNombre.value = '';
+    errorNombre.textContent = '';
+    inputApellido.classList.remove('error');
+    listaResultados.innerHTML = '';
     mostrarPantalla('consulta');
-    // Pequeño retraso para que el foco funcione tras la animación
-    setTimeout(() => inputDNI.focus(), 350);
+    setTimeout(() => {
+      // Foco al campo activo
+      if (panelDNI.classList.contains('activo')) inputDNI.focus();
+      else inputApellido.focus();
+    }, 350);
   }
 
-  btnBienvenida.addEventListener('click', irAConsulta);
-  btnBienvenida.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      irAConsulta();
-    }
+  document.getElementById('btnBienvenida').addEventListener('click', irAConsulta);
+  document.getElementById('btnBienvenida').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); irAConsulta(); }
   });
 
   /* ============================================================
-     VALIDACIÓN DEL CAMPO DNI (solo números, máx. 8 dígitos)
-     ============================================================ */
+     TABS - CAMBIO DE MODO
+  ============================================================ */
+  function activarTab(tab) {
+    // Limpiar errores y lista al cambiar de tab
+    errorDNI.textContent = '';
+    errorNombre.textContent = '';
+    inputDNI.classList.remove('error');
+    inputApellido.classList.remove('error');
+    listaResultados.innerHTML = '';
+
+    if (tab === 'dni') {
+      tabDNI.classList.add('activo');   tabDNI.setAttribute('aria-selected', 'true');
+      tabNombre.classList.remove('activo'); tabNombre.setAttribute('aria-selected', 'false');
+      panelDNI.classList.add('activo'); panelNombre.classList.remove('activo');
+      setTimeout(() => inputDNI.focus(), 100);
+    } else {
+      tabNombre.classList.add('activo'); tabNombre.setAttribute('aria-selected', 'true');
+      tabDNI.classList.remove('activo'); tabDNI.setAttribute('aria-selected', 'false');
+      panelNombre.classList.add('activo'); panelDNI.classList.remove('activo');
+      setTimeout(() => inputApellido.focus(), 100);
+    }
+  }
+
+  tabDNI.addEventListener('click', () => activarTab('dni'));
+  tabNombre.addEventListener('click', () => activarTab('nombre'));
+
+  /* ============================================================
+     VALIDACIÓN CAMPO DNI
+  ============================================================ */
   inputDNI.addEventListener('input', () => {
-    // Sanitización: eliminar todo lo que no sea dígito
-    let valor = inputDNI.value.replace(/[^0-9]/g, '');
-    if (valor.length > 8) {
-      valor = valor.slice(0, 8);
-    }
-    inputDNI.value = valor;
-
-    if (valor.length > 0) {
-      errorDNI.textContent = '';
-      inputDNI.classList.remove('error');
-    }
+    let v = inputDNI.value.replace(/[^0-9]/g, '').slice(0, 8);
+    inputDNI.value = v;
+    if (v.length > 0) { errorDNI.textContent = ''; inputDNI.classList.remove('error'); }
   });
 
   /* ============================================================
-     ENVÍO DEL FORMULARIO DE CONSULTA
-     ============================================================ */
-  formConsulta.addEventListener('submit', async (evento) => {
-    evento.preventDefault();
-
+     FORMULARIO DNI - ENVÍO
+  ============================================================ */
+  formDNI.addEventListener('submit', async e => {
+    e.preventDefault();
     const dni = inputDNI.value.trim();
-
-    // Validación de DNI: solo números, longitud entre 6 y 8
     if (!/^[0-9]{6,8}$/.test(dni)) {
       errorDNI.textContent = 'Ingrese un número de documento válido (6 a 8 dígitos, solo números).';
       inputDNI.classList.add('error');
       inputDNI.focus();
       return;
     }
-
-    await consultarDNI(dni);
+    await consultarPorDNI(dni);
   });
 
-  /* ============================================================
-     CONSULTA AL GOOGLE APPS SCRIPT
-     ============================================================ */
-  async function consultarDNI(dni) {
+  async function consultarPorDNI(dni) {
     mostrarLoader(true);
-    btnConsultar.disabled = true;
-
+    document.getElementById('btnConsultarDNI').disabled = true;
     try {
-      const url = `${URL_APPS_SCRIPT}?dni=${encodeURIComponent(dni)}`;
-      const respuesta = await fetch(url, { method: 'GET' });
-
-      if (!respuesta.ok) {
-        throw new Error('Respuesta de red no válida: ' + respuesta.status);
-      }
-
-      const datos = await respuesta.json();
-
-      // Control de respuestas vacías o mal formadas
-      if (!datos || typeof datos.encontrado === 'undefined') {
-        throw new Error('Respuesta inesperada del servidor.');
-      }
-
-      if (datos.encontrado === true) {
-        mostrarResultadoExitoso(datos);
+      const resp = await fetch(`${URL_APPS_SCRIPT}?accion=dni&dni=${encodeURIComponent(dni)}`);
+      if (!resp.ok) throw new Error('Error de red');
+      const datos = await resp.json();
+      if (!datos || typeof datos.encontrado === 'undefined') throw new Error('Respuesta inválida');
+      if (datos.encontrado) {
+        mostrarExito(datos);
       } else {
-        mostrarResultadoNoEncontrado(dni);
+        resultadoDNINoEnc.textContent = sanitizar(dni);
+        mostrarPantalla('noEncontrado');
       }
-
-    } catch (error) {
-      // Manejo de errores: informar al usuario sin tecnicismos
+    } catch (err) {
       errorDNI.textContent = 'Ocurrió un problema al consultar. Intente nuevamente en unos instantes.';
       inputDNI.classList.add('error');
-      console.error('Error en la consulta:', error);
+      console.error(err);
     } finally {
       mostrarLoader(false);
-      btnConsultar.disabled = false;
+      document.getElementById('btnConsultarDNI').disabled = false;
     }
   }
 
   /* ============================================================
-     MOSTRAR / OCULTAR LOADER
-     ============================================================ */
-  function mostrarLoader(activo) {
-    if (activo) {
-      loader.classList.add('activo');
-    } else {
-      loader.classList.remove('activo');
+     FORMULARIO NOMBRE - BÚSQUEDA
+  ============================================================ */
+  // Convertir a mayúsculas automáticamente mientras escribe
+  inputApellido.addEventListener('input', () => {
+    const pos = inputApellido.selectionStart;
+    inputApellido.value = inputApellido.value.toUpperCase();
+    inputApellido.setSelectionRange(pos, pos);
+    if (inputApellido.value.length > 0) { errorNombre.textContent = ''; inputApellido.classList.remove('error'); }
+    listaResultados.innerHTML = '';
+  });
+  inputNombre.addEventListener('input', () => {
+    const pos = inputNombre.selectionStart;
+    inputNombre.value = inputNombre.value.toUpperCase();
+    inputNombre.setSelectionRange(pos, pos);
+    listaResultados.innerHTML = '';
+  });
+
+  formNombre.addEventListener('submit', async e => {
+    e.preventDefault();
+    const apellido = inputApellido.value.trim();
+    const nombre   = inputNombre.value.trim();
+
+    if (apellido.length < 2) {
+      errorNombre.textContent = 'Ingrese al menos 2 letras del apellido.';
+      inputApellido.classList.add('error');
+      inputApellido.focus();
+      return;
+    }
+    await buscarPorNombre(apellido, nombre);
+  });
+
+  async function buscarPorNombre(apellido, nombre) {
+    mostrarLoader(true);
+    document.getElementById('btnBuscarNombre').disabled = true;
+    listaResultados.innerHTML = '';
+    try {
+      const params = new URLSearchParams({ accion: 'nombre', apellido });
+      if (nombre) params.append('nombre', nombre);
+      const resp = await fetch(`${URL_APPS_SCRIPT}?${params.toString()}`);
+      if (!resp.ok) throw new Error('Error de red');
+      const datos = await resp.json();
+      if (!datos || !Array.isArray(datos.resultados)) throw new Error('Respuesta inválida');
+      mostrarListaResultados(datos.resultados);
+    } catch (err) {
+      errorNombre.textContent = 'Ocurrió un problema al buscar. Intente nuevamente en unos instantes.';
+      console.error(err);
+    } finally {
+      mostrarLoader(false);
+      document.getElementById('btnBuscarNombre').disabled = false;
     }
   }
 
   /* ============================================================
-     RESULTADO EXITOSO (Pantalla 3)
-     ============================================================ */
-  function mostrarResultadoExitoso(datos) {
-    // Sanitización básica del texto recibido antes de insertarlo
-    resultadoNombre.textContent = sanitizarTexto(datos.apellido_y_nombre || '');
-    resultadoUnidad.textContent = sanitizarTexto(datos.unidad_academica || '');
+     MOSTRAR LISTA DE COINCIDENCIAS
+  ============================================================ */
+  function mostrarListaResultados(resultados) {
+    listaResultados.innerHTML = '';
+
+    if (resultados.length === 0) {
+      listaResultados.innerHTML = '<div class="lista-mensaje">No se encontraron coincidencias. Intente con otro apellido.</div>';
+      return;
+    }
+
+    if (resultados.length > 50) {
+      listaResultados.innerHTML = '<div class="lista-mensaje">Hay demasiados resultados. Agregue el nombre para acotar la búsqueda.</div>';
+      return;
+    }
+
+    resultados.forEach((persona, idx) => {
+      const item = document.createElement('div');
+      item.className = 'item-resultado';
+      item.setAttribute('role', 'option');
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('aria-label', `${sanitizar(persona.apellido_y_nombre)}, ${sanitizar(persona.unidad_academica)}`);
+
+      item.innerHTML = `
+        <span class="item-resultado__nombre">${sanitizar(persona.apellido_y_nombre)}</span>
+        <span class="item-resultado__unidad">${sanitizar(persona.unidad_academica)}</span>
+      `;
+
+      const seleccionar = () => mostrarExito(persona);
+      item.addEventListener('click', seleccionar);
+      item.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); seleccionar(); }
+        // Navegación con flechas dentro de la lista
+        if (e.key === 'ArrowDown') { e.preventDefault(); const sig = item.nextElementSibling; if (sig) sig.focus(); }
+        if (e.key === 'ArrowUp')   { e.preventDefault(); const ant = item.previousElementSibling; if (ant) ant.focus(); }
+      });
+
+      listaResultados.appendChild(item);
+    });
+
+    // Enfocar el primer resultado para facilitar navegación
+    listaResultados.firstElementChild && listaResultados.firstElementChild.focus();
+  }
+
+  /* ============================================================
+     MOSTRAR RESULTADO EXITOSO (Pantalla 3)
+  ============================================================ */
+  function mostrarExito(datos) {
+    resultadoNombre.textContent = sanitizar(datos.apellido_y_nombre || '');
+    resultadoUnidad.textContent = sanitizar(datos.unidad_academica || '');
     mostrarPantalla('exito');
   }
 
   /* ============================================================
-     RESULTADO NO ENCONTRADO (Pantalla 4)
-     ============================================================ */
-  function mostrarResultadoNoEncontrado(dni) {
-    resultadoDNINoEncontrado.textContent = sanitizarTexto(dni);
-    mostrarPantalla('noEncontrado');
-  }
-
-  /* ============================================================
-     SANITIZACIÓN SIMPLE DE TEXTO (previene inyección de HTML)
-     ============================================================ */
-  function sanitizarTexto(texto) {
-    const div = document.createElement('div');
-    div.textContent = String(texto);
-    return div.textContent;
-  }
-
-  /* ============================================================
-     BOTONES DE NAVEGACIÓN: PANTALLA 3 (ÉXITO)
-     ============================================================ */
+     BOTONES PANTALLA 3
+  ============================================================ */
   document.getElementById('btnExitoOtraConsulta').addEventListener('click', irAConsulta);
-  document.getElementById('btnExitoFinalizar').addEventListener('click', () => {
-    mostrarPantalla('bienvenida');
-  });
+  document.getElementById('btnExitoFinalizar').addEventListener('click', () => mostrarPantalla('bienvenida'));
 
   /* ============================================================
-     BOTONES DE NAVEGACIÓN: PANTALLA 4 (NO ENCONTRADO)
-     ============================================================ */
+     BOTONES PANTALLA 4
+  ============================================================ */
   document.getElementById('btnNoEncontradoReintentar').addEventListener('click', irAConsulta);
-  document.getElementById('btnNoEncontradoFinalizar').addEventListener('click', () => {
-    mostrarPantalla('bienvenida');
-  });
+  document.getElementById('btnNoEncontradoFinalizar').addEventListener('click', () => mostrarPantalla('bienvenida'));
 </script>
 
 </body>
